@@ -1,11 +1,15 @@
 import Board from "./Components/Board/Board";
+import { store } from "./stores/store";
+import { Provider } from "react-redux";
 
 function App() {
   return (
     <>
-      <div>
-        <Board />
-      </div>
+      <Provider store={store}>
+        <div>
+          <Board />
+        </div>
+      </Provider>
     </>
   );
 }

@@ -2,3 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind variants;
+
+/* .canvas-container,.upper-canvas,#board{
+    height: 150px!important;
+    width: 150px!important;
+}
+.canvas-container{
+    display: flex;
+} */
+
+/* #board{
+    width: 100%!important;
+    height: 100%!important;
+} */
+
+/* .canvas-container{
+    width: 100%!important;
+    /* height: 100%!important;
+} */
