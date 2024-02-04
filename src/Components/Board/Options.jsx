@@ -314,6 +314,30 @@ export default function Options() {
               circle
             </span>
           </button>
+          <button
+            className={`mx-1 text-lg font-bold border-black px-2 text-center  ${
+              properties.shape === "line"
+                ? "border-t-2 border-l-2 "
+                : "border-r-2 border-b-2"
+            }`}
+            onClick={() => shape("line")}
+          >
+            <span className="material-symbols-outlined transform rotate-45 scale-125 ">
+              horizontal_rule
+            </span>
+          </button>
+          {properties.shape === "line" && (
+            <>
+              <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+              <div className="flex items-center justify-center">
+                <span className="font-semibold">Size: </span>
+                <SizeBtn hw="p-[0.25rem]" size={1} />
+                <SizeBtn hw="p-[0.4rem]" size={2} />
+                <SizeBtn hw="p-[0.55rem]" size={6} />
+                <SizeBtn hw="p-[0.7rem]" size={12} />
+              </div>
+            </>
+          )}
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
           <ColourPalate />
         </div>

@@ -69,19 +69,21 @@ const Canvas = forwardRef((props, ref) => {
     board.current.off("mouse:down");
     board.current.off("mouse:move");
     board.current.off("mouse:up");
+    board.current.off("mouse:up", doneShape);
     board.current.on("mouse:down", (options) => {
       document.removeEventListener("keyup", deleteKeyElemRem);
       document.addEventListener("keyup", deleteKeyElemRem);
 
-      if (
-        options.target !== null &&
-        ToolStore.tool !== "eraser" &&
-        ToolStore.properties.mode !== "remover" &&
-        ToolStore.tool !== "pencil"
-      ) {
-        dispatch(changeTool({ tool: "selection" }));
-      }
+      // if (
+      //   options.target !== null &&
+      //   ToolStore.tool !== "eraser" &&
+      //   ToolStore.properties.mode !== "remover" &&
+      //   ToolStore.tool !== "pencil"
+      // ) {
+      //   dispatch(changeTool({ tool: "selection" }));
+      // }
     });
+    board.current.isDrawingMode = false;
 
     if (ToolStore.tool === "selection") Selection();
     else if (ToolStore.tool === "pencil") Pencil();
@@ -101,68 +103,82 @@ const Canvas = forwardRef((props, ref) => {
     // if(shape)
   };
   const addShape = (options) => {
-    // console.log("Add Shape", ToolStore.properties.shape);
     board.current.selection = false;
-    board.current.discardActiveObject();
+    board.current.getObjects().forEach((object) => {
+      object.set("selectable", false);
+      object.set("evented", false);
+    });
     const pointer = board.current.getPointer(options.e);
     board.current.isDrawingMode = false;
-    console.log("Add Shape", "rectangle");
     if (ToolStore.properties.shape === "rectangle") {
+      // console.log("Add Shape", "rectangle");
       const rect = new fabric.Rect({
         left: pointer.x,
         top: pointer.y,
-        width: 10,
-        height: 10,
+        width: 0,
+        height: 0,
+        rx: null,
+        ry: null,
         fill: ToolStore.color,
       });
       board.current.add(rect);
       if (rect) {
         board.current.setActiveObject(rect);
       }
-      board.current.on("mouse:move", drawShape);
     } else if (ToolStore.properties.shape === "circle") {
-      console.log("Add Shape", "circle");
+      // console.log("Add Shape", "circle");
       const circle = new fabric.Circle({
         left: pointer.x,
         top: pointer.y,
-        radius: 5,
+        radius: 0,
         fill: ToolStore.color,
       });
       board.current.add(circle);
       if (circle) {
         board.current.setActiveObject(circle);
       }
-      board.current.on("mouse:move", drawShape);
     } else if (ToolStore.properties.shape === "triangle") {
-      console.log("Add Shape", "triangle");
+      // console.log("Add Shape", "triangle");
       const triangle = new fabric.Triangle({
         left: pointer.x,
         top: pointer.y,
-        width: 10,
-        height: 10,
+        width: 0,
+        height: 0,
         fill: ToolStore.color,
       });
       board.current.add(triangle);
       if (triangle) {
         board.current.setActiveObject(triangle);
       }
-      board.current.on("mouse:move", drawShape);
     } else if (ToolStore.properties.shape === "ellipse") {
-      console.log("Add Shape", "ellipse");
+      // console.log("Add Shape", "ellipse");
       const ellipse = new fabric.Ellipse({
         left: pointer.x,
         top: pointer.y,
-        rx: 5, // horizontal radius
-        ry: 5, // vertical radius
-        radius: 5,
+        rx: 0, // horizontal radius
+        ry: 0, // vertical radius
         fill: ToolStore.color,
       });
       board.current.add(ellipse);
       if (ellipse) {
         board.current.setActiveObject(ellipse);
       }
-      board.current.on("mouse:move", drawShape);
+    } else if (ToolStore.properties.shape === "line") {
+      // console.log("Add Shape", "line");
+      const line = new fabric.Line(
+        [pointer.x, pointer.y, pointer.x, pointer.y],
+        {
+          stroke: ToolStore.color || "black",
+          strokeWidth: ToolStore.properties.size || 2,
+          strokeLineCap: "round",
+        }
+      );
+      board.current.add(line);
+      if (line) {
+        board.current.setActiveObject(line);
+      }
     }
+    board.current.on("mouse:move", drawShape);
   };
 
   const drawShape = (options) => {
@@ -170,55 +186,61 @@ const Canvas = forwardRef((props, ref) => {
     const shape = board.current.getActiveObject();
     const pointer = board.current.getPointer(options.e);
     // Update the width and height of the rectangle while dragging
-    if (
-      ToolStore.properties.shape === "rectangle" ||
-      ToolStore.properties.shape === "triangle"
-    ) {
-      shape.width = pointer.x - shape.left;
-      shape.height = pointer.y - shape.top;
-    } else if (ToolStore.properties.shape === "circle") {
-      shape.radius = (pointer.x - shape.left) / 2;
-    } else if (ToolStore.properties.shape === "ellipse") {
-      shape.rx = pointer.x - shape.left;
-      shape.ry = pointer.x - shape.left;
+    if (shape !== null) {
+      if (
+        ToolStore.properties.shape === "rectangle" ||
+        ToolStore.properties.shape === "triangle"
+      ) {
+        shape.set({
+          width: Math.abs(pointer.x - shape.left),
+          height: Math.abs(pointer.y - shape.top),
+        });
+      } else if (ToolStore.properties.shape === "circle") {
+        shape.set({ radius: Math.abs((pointer.x - shape.left) / 2) });
+      } else if (ToolStore.properties.shape === "ellipse") {
+        shape.set({
+          rx: Math.abs(pointer.x - shape.left),
+          ry: Math.abs(pointer.y - shape.top),
+        });
+      } else if (ToolStore.properties.shape === "line") {
+        shape.set({ x2: pointer.x, y2: pointer.y });
+      }
     }
-
     board.current.renderAll();
   };
 
   const doneShape = () => {
     board.current.isDrawingMode = false;
     board.current.off("mouse:move");
-    dispatch(
-      changeTool({
-        tool: "selection",
-        properties: { ...ToolStore.properties },
-      })
-    );
+    // console.log(ToolStore.properties.shape);
+    if (
+      "shape" in ToolStore.properties &&
+      ToolStore.properties.shape !== "line"
+    ) {
+    }
     board.current.selection = true;
     board.current.renderAll();
     const shape = board.current.getActiveObject();
+    console.log(shape.width, shape.height, shape.rx, shape.ry, shape.radius);
     if (shape !== null) {
-      if (shape.width < 0 || shape.height < 0) {
-        shape.height = Math.abs(shape.height);
-        shape.width = Math.abs(shape.width);
-        shape.left = shape.left - shape.width;
-        shape.top = shape.top - shape.height;
-      }
-
-      if (shape.radius < 0) {
-        shape.radius = Math.abs(shape.radius);
-        shape.left = shape.left - shape.radius;
-        shape.top = shape.top - shape.radius;
-      }
-
-      if (shape.rx < 0 || shape.ry < 0) {
-        shape.height = Math.abs(shape.ry);
-        shape.width = Math.abs(shape.rx);
-        shape.left = shape.left - shape.rx;
-        shape.top = shape.top - shape.ry;
+      if (
+        shape.width === 0 ||
+        shape.height === 0 ||
+        shape.rx === 0 ||
+        shape.ry === 0 ||
+        shape.radius === 0
+      ) {
+        dispatch(
+          changeTool({
+            tool: "selection",
+            properties: { ...ToolStore.properties },
+          })
+        );
+        board.current.remove(shape);
       }
     }
+    shape.set("evented", false);
+    board.current.discardActiveObject();
     board.current.renderAll();
   };
 
@@ -261,6 +283,13 @@ const Canvas = forwardRef((props, ref) => {
   };
 
   const Selection = () => {
+    board.current.forEachObject((obj) => {
+      obj.set({ selectable: true });
+      obj.set("evented", true);
+    });
+    board.current.on("mouse:down", (options) => {
+      console.log(options.target.type);
+    });
     board.current.isDrawingMode = false;
     board.current.selection = true;
   };
@@ -274,6 +303,8 @@ const Canvas = forwardRef((props, ref) => {
 
   const Eraser = () => {
     // console.log("eraser");
+    console.log(ToolStore);
+    board.current.renderAll();
     if (ToolStore.properties.mode !== "remover") {
       board.current.isDrawingMode = true;
       board.current.freeDrawingBrush = new fabric.EraserBrush(board.current);
