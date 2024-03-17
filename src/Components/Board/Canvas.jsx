@@ -1,7 +1,6 @@
-/* eslint-disable */
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { saveState } from "../../stores/CanvasStore";
+import { saveState, undo, redo, setOperation } from "../../stores/CanvasStore";
 import { changeTool } from "../../stores/ToolStore.js";
 import { fabric } from "fabric";
 
@@ -11,80 +10,74 @@ const Canvas = forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const ToolStore = useSelector((state) => state.ToolStore);
   const CanvasStore = useSelector((state) => state.CanvasStore);
+  const [state, setState] = useState(-1);
+  const change = (options) => {
+    if (CanvasStore.operation === 0) {
+      dispatch(saveState(board.current.toObject()));
+      console.log(board.current.toObject());
+    }
+  };
+  const Undo = () => {
+    board.current.loadFromJSON(
+      CanvasStore.states[CanvasStore.currentState - 1]
+    );
+    dispatch(undo());
+  };
+  const Redo = () => {
+    board.current.loadFromJSON(
+      CanvasStore.states[CanvasStore.currentState + 1]
+    );
+    dispatch(redo());
+  };
+  const UndoRedoHandlerKey = (e) => {
+    let Zkey = e.code === "KeyZ" && e.ctrlKey;
+    let Ykey = e.code === "KeyY" && e.ctrlKey;
+    if (Zkey) dispatch(setOperation(1));
+    else if (Ykey) dispatch(setOperation(2));
+  };
+  useEffect(() => {
+    if (board.current !== null) {
+      if (CanvasStore.operation === 0) {
+        board.current.on("object:added", change);
+        board.current.on("object:modified", change);
+        board.current.on("object:removed", change);
+      }
+      if (CanvasStore.operation === 1) Undo();
+      else if (CanvasStore.operation === 2) Redo();
+    }
+    return () => {
+      board.current.off("object:added", change);
+      board.current.off("object:modified", change);
+      board.current.off("object:removed", change);
+    };
+  }, [board.current, CanvasStore.operation]);
+
   useEffect(() => {
     const initFabric = () => {
       if (board.current === null) {
-        var rect1 = new fabric.Rect({
-          left: 50,
-          top: 100,
-          fill: "red",
-          width: 100,
-          height: 100,
-        });
-        var rect2 = new fabric.Rect({
-          left: 300,
-          top: 200,
-          fill: "red",
-          width: 100,
-          height: 100,
-        });
-        var rect3 = new fabric.Rect({
-          left: 100,
-          top: 200,
-          fill: "red",
-          width: 100,
-          height: 100,
-        });
         board.current = new fabric.Canvas(canvas.current.id);
-        // board.current.add(rect1);
-        // board.current.add(rect2);
-        // board.current.add(rect3);
-        var poly = new fabric.Polyline(
-          [
-            { x: 10, y: 10 },
-            { x: 50, y: 30 },
-            { x: 40, y: 70 },
-            { x: 60, y: 50 },
-            { x: 100, y: 150 },
-            { x: 40, y: 100 },
-          ],
-          {
-            stroke: "red",
-            left: 100,
-            top: 100,
-          }
-        );
-        // board.current.add(poly);
+        dispatch(saveState(board.current.toObject()));
       }
-    };
-
-    const disposeFabric = () => {
-      console.log("save state dispose");
-      dispatch(saveState(board.current.toObject()));
-      board.current.dispose();
     };
 
     initFabric();
     setSize();
-    board.current.off("mouse:down");
-    board.current.off("mouse:move");
-    board.current.off("mouse:up");
-    board.current.off("mouse:up", doneShape);
+    document.addEventListener("keyup", UndoRedoHandlerKey);
     board.current.on("mouse:down", (options) => {
+      dispatch(setOperation(0));
       document.removeEventListener("keyup", deleteKeyElemRem);
       document.addEventListener("keyup", deleteKeyElemRem);
-
-      // if (
-      //   options.target !== null &&
-      //   ToolStore.tool !== "eraser" &&
-      //   ToolStore.properties.mode !== "remover" &&
-      //   ToolStore.tool !== "pencil"
-      // ) {
-      //   dispatch(changeTool({ tool: "selection" }));
-      // }
+      if (
+        options.target !== null &&
+        ToolStore.tool !== "eraser" &&
+        ToolStore.properties.mode !== "remover" &&
+        ToolStore.tool !== "pencil"
+      ) {
+        dispatch(changeTool({ tool: "selection" }));
+      }
     });
     board.current.isDrawingMode = false;
-
+    if (CanvasStore.operation !== 0) dispatch(setOperation(0));
     if (ToolStore.tool === "selection") Selection();
     else if (ToolStore.tool === "pencil") Pencil();
     else if (ToolStore.tool === "eraser") Eraser();
@@ -92,25 +85,27 @@ const Canvas = forwardRef((props, ref) => {
     else if (ToolStore.tool === "image") Image();
     else if (ToolStore.tool === "stickynote") stickynote();
     else if (ToolStore.tool === "shape") Shape();
+    return () => {
+      board.current.off("mouse:down");
+      board.current.off("mouse:move");
+      board.current.off("mouse:up");
+      document.removeEventListener("keyup", UndoRedoHandlerKey);
+    };
+  }, [dispatch, ToolStore, Canvas.currentState]);
 
-    // if (ToolStore.tool !== "selection") {
-    // document.removeEventListener("keyup", deleteKeyElemRem);
-    // }
-    return () => {};
-  }, [dispatch, ToolStore]);
-
-  const mouseMoveShape = (shape) => {
-    // if(shape)
-  };
   const addShape = (options) => {
-    board.current.selection = false;
-    board.current.getObjects().forEach((object) => {
-      object.set("selectable", false);
-      object.set("evented", false);
+    if (!"shape" in ToolStore.properties) board.current.selection = true;
+    else board.current.selection = false;
+    board.current.discardActiveObject();
+    board.current.getObjects().forEach((e) => {
+      e.set("evented", false);
+      e.set("selectable", false);
     });
+    // board.current.renderAll();
+    console.log(board.current.getActiveObjects());
     const pointer = board.current.getPointer(options.e);
     board.current.isDrawingMode = false;
-    if (ToolStore.properties.shape === "rectangle") {
+    if (ToolStore.properties.shape === "rect") {
       // console.log("Add Shape", "rectangle");
       const rect = new fabric.Rect({
         left: pointer.x,
@@ -177,6 +172,20 @@ const Canvas = forwardRef((props, ref) => {
       if (line) {
         board.current.setActiveObject(line);
       }
+    } else {
+      const rect = new fabric.Rect({
+        left: pointer.x,
+        top: pointer.y,
+        width: 0,
+        height: 0,
+        rx: null,
+        ry: null,
+        fill: ToolStore.color,
+      });
+      board.current.add(rect);
+      if (rect) {
+        board.current.setActiveObject(rect);
+      }
     }
     board.current.on("mouse:move", drawShape);
   };
@@ -188,7 +197,7 @@ const Canvas = forwardRef((props, ref) => {
     // Update the width and height of the rectangle while dragging
     if (shape !== null) {
       if (
-        ToolStore.properties.shape === "rectangle" ||
+        ToolStore.properties.shape === "rect" ||
         ToolStore.properties.shape === "triangle"
       ) {
         shape.set({
@@ -204,6 +213,11 @@ const Canvas = forwardRef((props, ref) => {
         });
       } else if (ToolStore.properties.shape === "line") {
         shape.set({ x2: pointer.x, y2: pointer.y });
+      } else {
+        shape.set({
+          width: Math.abs(pointer.x - shape.left),
+          height: Math.abs(pointer.y - shape.top),
+        });
       }
     }
     board.current.renderAll();
@@ -221,7 +235,7 @@ const Canvas = forwardRef((props, ref) => {
     board.current.selection = true;
     board.current.renderAll();
     const shape = board.current.getActiveObject();
-    console.log(shape.width, shape.height, shape.rx, shape.ry, shape.radius);
+    console.log(shape);
     if (shape !== null) {
       if (
         shape.width === 0 ||
@@ -238,13 +252,15 @@ const Canvas = forwardRef((props, ref) => {
         );
         board.current.remove(shape);
       }
+      shape.set("evented", false);
     }
-    shape.set("evented", false);
     board.current.discardActiveObject();
     board.current.renderAll();
   };
 
   const Shape = () => {
+    board.current.selection = true;
+    // dispatch(setOperation(0));
     board.current.off("mouse:down");
     board.current.off("mouse:move");
     board.current.off("mouse:up ");
@@ -270,6 +286,7 @@ const Canvas = forwardRef((props, ref) => {
       dispatch(changeTool({ tool: "pencil", properties: { size: 3 } }));
     }
     board.current.freeDrawingBrush.width = ToolStore.properties.size;
+    board.current.freeDrawingBrush.opacity = 0.5;
   };
 
   const deleteKeyElemRem = (e) => {
@@ -288,7 +305,29 @@ const Canvas = forwardRef((props, ref) => {
       obj.set("evented", true);
     });
     board.current.on("mouse:down", (options) => {
-      console.log(options.target.type);
+      if (options.target !== null) {
+        const obj = options.target;
+        const objType = obj.type;
+
+        if (
+          objType === "rect" ||
+          objType === "circle" ||
+          objType === "ellipse" ||
+          objType === "triangle" ||
+          objType === "line"
+        ) {
+          const color = () => {
+            if (objType === "line") {
+              return obj.stroke;
+            } else {
+              return obj.fill;
+            }
+          };
+          dispatch(
+            changeTool({ editable: "shape", color: color(), properties: {} })
+          );
+        }
+      }
     });
     board.current.isDrawingMode = false;
     board.current.selection = true;
@@ -322,28 +361,60 @@ const Canvas = forwardRef((props, ref) => {
 
   const Text = () => {
     board.current.isDrawingMode = false;
-    if (ToolStore.properties.size && ToolStore.properties.size !== "") {
-      const text = new fabric.Textbox("Add Text", {
-        fontSize: ToolStore.properties.size,
-        left: board.current.getCenter().left - ToolStore.properties.size,
-        top: board.current.getCenter().top - ToolStore.properties.size,
-        fill: ToolStore.color || "black",
-        fontFamily: ToolStore.properties.font || "",
-        fontStyle: ToolStore.properties.style || "normal",
-        fontWeight: ToolStore.properties.fontWeight || "normal",
-        underline: ToolStore.properties.underline || false,
-        textAlign: ToolStore.properties.align || "left",
-      });
-      console.log(ToolStore.properties);
-      board.current.add(text);
-    }
+    board.current.on("mouse:down", (options) => {
+      // console.log(options.target.type);
+      if (options.target !== null && options.target.type === "textbox") {
+        console.log(options.target);
+        const text = options.target;
+        dispatch(
+          changeTool({
+            tool: "text",
+            editable: "true",
+            color: text.fill,
+            properties: {
+              size: text.fontSize,
+              font: text.fontFamily || "",
+              style: text.fontStyle || "normal",
+              fontWeight: text.fontWeight || "normal",
+              underline: text.underline || false,
+              align: text.textAlign || "left",
+            },
+          })
+        );
+      } else {
+        const pointer = board.current.getPointer(options.e);
+        console.log(board.current.getObjects());
+        const size =
+          "size" in ToolStore.properties && ToolStore.properties.size > 9
+            ? ToolStore.properties.size
+            : 35;
+        const text = new fabric.Textbox("Add Text", {
+          fontSize: size,
+          left: pointer.x - size,
+          top: pointer.y - size,
+          fill: ToolStore.color || "black",
+          fontFamily: ToolStore.properties.font || "",
+          fontStyle: ToolStore.properties.style || "normal",
+          fontWeight: ToolStore.properties.fontWeight || "normal",
+          underline: ToolStore.properties.underline || false,
+          textAlign: ToolStore.properties.align || "left",
+        });
+        console.log(text);
+        board.current.add(text);
+      }
+    });
   };
 
   const Image = () => {
     if ("src" in ToolStore.properties) {
       fabric.Image.fromURL(ToolStore.properties.src, (img) => {
-        img.scaleToHeight(ToolStore.properties.height);
-        img.scaleToWidth(ToolStore.properties.width);
+        if (
+          ToolStore.properties.height >= 30 &&
+          ToolStore.properties.width >= 30
+        ) {
+          img.scaleToHeight(ToolStore.properties.height);
+          img.scaleToWidth(ToolStore.properties.width);
+        }
         board.current.add(img);
       });
     }
@@ -379,12 +450,6 @@ const Canvas = forwardRef((props, ref) => {
     });
 
     canvas.add(group);
-    // group.onSelect = () => {
-    //   const items = group._objects.slice();
-    //   canvas.remove(group);
-    //   canvas.add(...items);
-    //   canvas.renderAll();
-    // };
   };
 
   return (

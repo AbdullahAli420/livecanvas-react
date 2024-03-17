@@ -10,6 +10,7 @@ import TextStyleBtn from "./TextStyleBtn";
 
 export default function Options() {
   const tool = useSelector((state) => state.ToolStore.tool);
+  const editable = useSelector((state) => state.ToolStore.editable);
   const properties = useSelector((state) => state.ToolStore.properties);
   const dispatch = useDispatch();
   const textBold = () => {
@@ -32,7 +33,7 @@ export default function Options() {
     }
   };
   const textItalic = () => {
-    if ("style" in properties) {
+    if ("style" in properties && "style" === "italic") {
       const props = { ...properties };
       delete props.style;
       dispatch(
@@ -51,7 +52,7 @@ export default function Options() {
     }
   };
   const underline = () => {
-    if ("underline" in properties) {
+    if ("underline" in properties && properties.underline === true) {
       const props = { ...properties };
       delete props.underline;
       dispatch(
@@ -109,10 +110,18 @@ export default function Options() {
       );
     }
   };
-  // console.log(properties);
+
   return (
     <>
-      {/* Pencil */}
+      {/* Selection */}
+      {tool === "selection" && (
+        <div className="flex items-center px-3">
+          <span className="material-symbols-outlined">arrow_selector_tool</span>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <ColourPalate />
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+        </div>
+      )}
       {tool === "pencil" && (
         <div className="flex items-center px-3">
           <span className="material-symbols-outlined">edit</span>
@@ -121,14 +130,14 @@ export default function Options() {
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
           <div className="flex items-center justify-center">
             <span className="font-semibold">Size: </span>
-            <SizeBtn hw="p-[0.25rem]" size={1} />
-            <SizeBtn hw="p-[0.4rem]" size={2} />
-            <SizeBtn hw="p-[0.55rem]" size={3} />
-            <SizeBtn hw="p-[0.7rem]" size={4} />
+            <SizeBtn hw="p-[0.25rem]" size={2} />
+            <SizeBtn hw="p-[0.4rem]" size={3} />
+            <SizeBtn hw="p-[0.55rem]" size={4} />
+            <SizeBtn hw="p-[0.7rem]" size={6} />
           </div>
         </div>
       )}
-      {/* Pencil */}
+      {/* Selection */}
       {/* Eraser */}
       {tool === "eraser" && (
         <div className="flex items-center px-3">
@@ -177,24 +186,68 @@ export default function Options() {
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
           <ColourPalate />
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
-          <div className="flex items-center justify-center">
-            <span className="font-semibold underline">Font Size: </span>
-            <TextSizeBtn font="text-xl" size={50} title="h1" />
-            <TextSizeBtn font="text-lg" size={35} title="h2" />
-            <TextSizeBtn font="text-base" size={25} title="h3" />
-            <TextSizeBtn font="text-sm" size={10} title="h4" />
+          <div className="flex items-center justify-center max-w-sm mx-auto">
+            {/* <span className="font-semibold underline">Font Size: </span> */}
+            <select
+              onChange={(e) => {
+                dispatch(
+                  changeTool({
+                    tool: tool,
+                    properties: { ...properties, size: e.target.value },
+                  })
+                );
+              }}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option value="50" className="flex text-xl mx-1">
+                H1
+              </option>
+              <option value="35" className="flex text-lg mx-1">
+                H2
+              </option>
+              <option value="25" className="flex text-base mx-1">
+                H3
+              </option>
+              <option value="12" className="flex text-sm mx-1">
+                H4
+              </option>
+            </select>
           </div>
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
           <div className="flex items-center justify-center">
-            <span className="font-semibold underline">Font Size: </span>
-            <TextFontBtn style="font-sans" font="sans-serif" />
-            <TextFontBtn style="font-serif" font="Times New Roman" />
-            <TextFontBtn style="font-mono" font="Consolas" />
+            {/* <span className="font-semibold underline">Font Style: </span> */}
+            <select
+              onChange={(e) =>
+                dispatch(
+                  changeTool({
+                    tool: tool,
+                    properties: { font: e.target.value },
+                  })
+                )
+              }
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option
+                value="sans-serif"
+                className="flex font-sans text-xl mx-1"
+              >
+                sans-serif
+              </option>
+              <option
+                value="Times New Roman"
+                className="flex font-serif text-xl mx-1"
+              >
+                Times New Roman
+              </option>
+              <option value="Consolas" className="flex font-mono text-xl mx-1">
+                Consolas
+              </option>
+            </select>
           </div>
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
           <button
             className={`mx-1 text-lg font-bold border-black px-2 text-center  ${
-              "fontWeight" in properties
+              "fontWeight" in properties && properties.fontWeight === "700"
                 ? "border-t-2 border-l-2 "
                 : "border-r-2 border-b-2"
             }`}
@@ -204,7 +257,7 @@ export default function Options() {
           </button>
           <button
             className={`mx-1 text-lg italic border-black px-2 text-center  ${
-              "style" in properties
+              "style" in properties && properties.style === "italic"
                 ? "border-t-2 border-l-2"
                 : "border-r-2 border-b-2"
             }`}
@@ -214,7 +267,7 @@ export default function Options() {
           </button>
           <button
             className={`mx-1 text-lg underline border-black px-2 text-center  ${
-              "underline" in properties
+              "underline" in properties && properties.underline === true
                 ? "border-t-2 border-l-2"
                 : "border-r-2 border-b-2"
             }`}
@@ -231,7 +284,7 @@ export default function Options() {
             }`}
             onClick={() => textAlign("left")}
           >
-            <span class="material-symbols-outlined">format_align_left</span>
+            <span className="material-symbols-outlined">format_align_left</span>
           </button>
           <button
             className={`mx-1 text-lg italic border-black px-2 text-center  ${
@@ -241,7 +294,9 @@ export default function Options() {
             }`}
             onClick={() => textAlign("center")}
           >
-            <span class="material-symbols-outlined">format_align_center</span>
+            <span className="material-symbols-outlined">
+              format_align_center
+            </span>
           </button>
           <button
             className={`mx-1 text-lg underline border-black px-2 text-center  ${
@@ -251,7 +306,9 @@ export default function Options() {
             }`}
             onClick={() => textAlign("right")}
           >
-            <span class="material-symbols-outlined">format_align_right</span>
+            <span className="material-symbols-outlined">
+              format_align_right
+            </span>
           </button>
         </div>
       )}
@@ -274,11 +331,11 @@ export default function Options() {
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
           <button
             className={`mx-1 text-lg font-bold border-black px-2 text-center  ${
-              properties.shape === "rectangle"
+              properties.shape === "rect"
                 ? "border-t-2 border-l-2 "
                 : "border-r-2 border-b-2"
             }`}
-            onClick={() => shape("rectangle")}
+            onClick={() => shape("rect")}
           >
             <span className="material-symbols-outlined">rectangle</span>
           </button>

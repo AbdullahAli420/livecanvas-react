@@ -13,7 +13,9 @@ export default function ToolButton({ name, icon }) {
         tool === name ? "bg-gray-600 text-white" : ""
       }`}
       onClick={() =>
-        dispatch(changeTool({ tool: name, properties: { ...properties } }))
+        dispatch(
+          changeTool({ tool: name, properties: { ...properties, src: null } })
+        )
       }
     >
       <span className="material-symbols-outlined">{icon}</span>

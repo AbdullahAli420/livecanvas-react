@@ -1,30 +1,39 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { changeTool } from "../../stores/ToolStore";
 import { useDispatch } from "react-redux";
 
 const ImageForm = () => {
-  const [height, setHeight] = useState(100);
-  const [width, setWidth] = useState(100);
+  const [height, setHeight] = useState(0);
+  const [width, setWidth] = useState(0);
   const dispatch = useDispatch();
   const pictureInput = useRef(null);
-  const AddPicture = () => {
-    if (pictureInput.current.files.length > 0) {
-      const reader = new FileReader();
-      reader.addEventListener("load", (reader) => {
-        console.log(reader);
-        dispatch(
-          changeTool({
-            tool: "image",
-            properties: {
-              src: reader.currentTarget.result,
-              width: width >= 5 ? width : 100,
-              height: height >= 5 ? height : 100,
-            },
-          })
-        );
+  const imgElem = useRef(null);
+  const [image, setImage] = useState(null);
+  useEffect(() => {
+    if (pictureInput !== null) {
+      pictureInput.current.addEventListener("change", (target) => {
+        if (pictureInput.current.files.length > 0) {
+          const reader = new FileReader();
+          reader.addEventListener("load", (reader) => {
+            setImage(reader.currentTarget.result);
+          });
+          reader.readAsDataURL(pictureInput.current.files[0]);
+        }
       });
-      reader.readAsDataURL(pictureInput.current.files[0]);
     }
+  });
+  const AddPicture = () => {
+    if (image !== null)
+      dispatch(
+        changeTool({
+          tool: "image",
+          properties: {
+            src: image,
+            width: width,
+            height: height,
+          },
+        })
+      );
   };
   return (
     <div className="flex  justify-center items-center">
@@ -49,6 +58,7 @@ const ImageForm = () => {
       >
         Add
       </button>
+      <img src="" ref={imgElem} className="hidden" />
     </div>
   );
 };

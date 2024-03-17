@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  tool: "shape",
+  tool: "text",
+  editable: "",
   properties: { shape: "circle" },
   color: "black",
   toolChanging: false,
@@ -12,15 +13,14 @@ export const ToolStore = createSlice({
   initialState,
   reducers: {
     changeTool: (state, action) => {
-      console.log(action);
-      state.tool = action.payload.tool;
+      state.tool = action.payload.tool || state.tool;
+      state.editable = action.payload.editable || state.editable;
       state.properties = action.payload.properties || {};
       state.toolChanging = true;
     },
     changeColor: (state, action) => {
       state.color = action.payload;
       if (state.tool === "text") state.properties.size = "";
-      console.log();
       state.toolChanging = true;
     },
     changedDone: (state) => {
