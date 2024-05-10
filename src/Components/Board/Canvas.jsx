@@ -10,22 +10,22 @@ const Canvas = forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const ToolStore = useSelector((state) => state.ToolStore);
   const CanvasStore = useSelector((state) => state.CanvasStore);
-  const [state, setState] = useState(-1);
   const change = (options) => {
     if (CanvasStore.operation === 0) {
       dispatch(saveState(board.current.toObject()));
-      console.log(board.current.toObject());
     }
   };
   const Undo = () => {
+    // board.current
+    // .loadFromJSON
     board.current.loadFromJSON(
-      CanvasStore.states[CanvasStore.currentState - 1]
+      JSON.stringify(CanvasStore.states[CanvasStore.currentState - 1])
     );
     dispatch(undo());
   };
   const Redo = () => {
     board.current.loadFromJSON(
-      CanvasStore.states[CanvasStore.currentState + 1]
+      JSON.stringify(CanvasStore.states[CanvasStore.currentState + 1])
     );
     dispatch(redo());
   };

@@ -115,19 +115,19 @@ export default function Options() {
     <>
       {/* Selection */}
       {tool === "selection" && (
-        <div className="flex items-center px-3">
+        <div className="lg:flex items-center px-3 block absolute bg-white left-16 top-16">
           <span className="material-symbols-outlined">arrow_selector_tool</span>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <ColourPalate />
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
         </div>
       )}
       {tool === "pencil" && (
-        <div className="flex items-center px-3">
+        <div className="lg:flex items-center px-3 block absolute bg-white left-16 top-16">
           <span className="material-symbols-outlined">edit</span>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <ColourPalate />
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <div className="flex items-center justify-center">
             <span className="font-semibold">Size: </span>
             <SizeBtn hw="p-[0.25rem]" size={2} />
@@ -140,9 +140,9 @@ export default function Options() {
       {/* Selection */}
       {/* Eraser */}
       {tool === "eraser" && (
-        <div className="flex items-center px-3">
+        <div className="lg:flex items-center px-3 block absolute bg-white left-16 top-16">
           <span className="material-symbols-outlined">ink_eraser</span>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <div className="flex items-center justify-center">
             <span className="font-semibold">Size: </span>
             <SizeBtn hw="p-[0.25rem]" size={5} />
@@ -150,7 +150,7 @@ export default function Options() {
             <SizeBtn hw="p-[0.55rem]" size={30} />
             <SizeBtn hw="p-[0.7rem]" size={50} />
           </div>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <button
             className={`flex justify-center items-center p-1 border-2 border-transparent  ${
               properties.mode == "remover"
@@ -181,12 +181,12 @@ export default function Options() {
       {/* Eraser */}
       {/* Text */}
       {tool === "text" && (
-        <div className="flex items-center px-3">
+        <div className="lg:flex items-center px-3 block absolute bg-white left-16 top-16">
           <span className="material-symbols-outlined">T</span>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <ColourPalate />
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
-          <div className="flex items-center justify-center max-w-sm mx-auto">
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
+          <div className="flex items-center justify-center">
             {/* <span className="font-semibold underline">Font Size: </span> */}
             <select
               onChange={(e) => {
@@ -197,7 +197,7 @@ export default function Options() {
                   })
                 );
               }}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
             >
               <option value="50" className="flex text-xl mx-1">
                 H1
@@ -213,7 +213,7 @@ export default function Options() {
               </option>
             </select>
           </div>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <div className="flex items-center justify-center">
             {/* <span className="font-semibold underline">Font Style: </span> */}
             <select
@@ -225,7 +225,7 @@ export default function Options() {
                   })
                 )
               }
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="bg-gray-50 border border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
             >
               <option
                 value="sans-serif"
@@ -244,7 +244,7 @@ export default function Options() {
               </option>
             </select>
           </div>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <button
             className={`mx-1 text-lg font-bold border-black px-2 text-center  ${
               "fontWeight" in properties && properties.fontWeight === "700"
@@ -275,7 +275,7 @@ export default function Options() {
           >
             U
           </button>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <button
             className={`mx-1 text-lg font-bold border-black px-2 text-center  ${
               properties.align === "left"
@@ -316,9 +316,9 @@ export default function Options() {
 
       {/* Image */}
       {tool === "image" && (
-        <div className="flex items-center px-3">
+        <div className="lg:flex items-center px-3 block absolute bg-white left-16 top-16">
           <span className="material-symbols-outlined">image</span>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <ImageForm />
         </div>
       )}
@@ -326,9 +326,9 @@ export default function Options() {
 
       {/* Image */}
       {tool === "shape" && (
-        <div className="flex items-center px-3">
+        <div className="lg:flex items-center px-3 block absolute bg-white left-16 top-16">
           <span className="material-symbols-outlined">shapes</span>
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <button
             className={`mx-1 text-lg font-bold border-black px-2 text-center  ${
               properties.shape === "rect"
@@ -385,7 +385,7 @@ export default function Options() {
           </button>
           {properties.shape === "line" && (
             <>
-              <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+              <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
               <div className="flex items-center justify-center">
                 <span className="font-semibold">Size: </span>
                 <SizeBtn hw="p-[0.25rem]" size={1} />
@@ -395,7 +395,7 @@ export default function Options() {
               </div>
             </>
           )}
-          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6"></div>
+          <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible"></div>
           <ColourPalate />
         </div>
       )}
