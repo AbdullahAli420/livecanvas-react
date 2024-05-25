@@ -6,6 +6,7 @@ const initialState = {
   properties: { shape: "circle" },
   color: "black",
   toolChanging: false,
+  options: true,
 };
 
 export const ToolStore = createSlice({
@@ -26,9 +27,19 @@ export const ToolStore = createSlice({
     changedDone: (state) => {
       state.toolChanging = false;
     },
+    setOptions: (state, action) => {
+      if (action.payload !== undefined) {
+        state.options = action.payload;
+      } else if (state.options === true) {
+        state.options = false;
+      } else {
+        state.options = true;
+      }
+    },
   },
 });
 
-export const { changeTool, changeColor, changedDone } = ToolStore.actions;
+export const { changeTool, changeColor, changedDone, setOptions } =
+  ToolStore.actions;
 
 export default ToolStore.reducer;

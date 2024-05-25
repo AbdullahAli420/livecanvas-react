@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setOperation } from "../../stores/CanvasStore";
+import { setOptions } from "../../stores/ToolStore";
 
 export default function CasualButton({ title, icon }) {
   const CanvasStore = useSelector((state) => state.CanvasStore);
@@ -12,6 +13,7 @@ export default function CasualButton({ title, icon }) {
         if (title === "undo") {
           dispatch(setOperation(1));
         } else if (title === "redo") dispatch(setOperation(2));
+        else if (title === "options") dispatch(setOptions());
       }}
     >
       <span className="material-symbols-outlined">{icon}</span>
