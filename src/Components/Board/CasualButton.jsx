@@ -1,10 +1,14 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setOperation } from "../../stores/CanvasStore";
-import { setOptions } from "../../stores/ToolStore";
+import {
+  setOptions,
+  setResize,
+  setCreate,
+  setManage,
+} from "../../stores/ToolStore";
 
 export default function CasualButton({ title, icon }) {
-  const CanvasStore = useSelector((state) => state.CanvasStore);
   const dispatch = useDispatch();
   return (
     <button
@@ -14,6 +18,9 @@ export default function CasualButton({ title, icon }) {
           dispatch(setOperation(1));
         } else if (title === "redo") dispatch(setOperation(2));
         else if (title === "options") dispatch(setOptions());
+        else if (title === "resize") dispatch(setResize());
+        else if (title === "create") dispatch(setCreate());
+        else if (title === "manage") dispatch(setManage());
       }}
     >
       <span className="material-symbols-outlined">{icon}</span>

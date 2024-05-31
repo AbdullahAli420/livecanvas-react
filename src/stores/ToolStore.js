@@ -1,12 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  tool: "text",
+  tool: "pencil",
   editable: "",
   properties: { shape: "circle" },
   color: "black",
   toolChanging: false,
-  options: true,
+  options: false,
+  resize: false,
+  create: true,
+  manage: true,
 };
 
 export const ToolStore = createSlice({
@@ -36,10 +39,43 @@ export const ToolStore = createSlice({
         state.options = true;
       }
     },
+    setResize: (state, action) => {
+      if (action.payload !== undefined) {
+        state.resize = false;
+      } else if (state.resize === true) {
+        state.resize = false;
+      } else {
+        state.resize = true;
+      }
+    },
+    setCreate: (state, action) => {
+      console.log(action.payload);
+      if (action.payload !== undefined) {
+        state.create = action.payload;
+      } else if (state.create === true) {
+        state.create = false;
+      } else {
+        state.create = true;
+      }
+    },
+    setManage: (state, action) => {
+      if (state.manage === true) {
+        state.manage = false;
+      } else {
+        state.manage = true;
+      }
+    },
   },
 });
 
-export const { changeTool, changeColor, changedDone, setOptions } =
-  ToolStore.actions;
+export const {
+  changeTool,
+  changeColor,
+  changedDone,
+  setOptions,
+  setResize,
+  setCreate,
+  setManage,
+} = ToolStore.actions;
 
 export default ToolStore.reducer;

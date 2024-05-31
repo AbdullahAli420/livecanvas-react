@@ -10,7 +10,7 @@ export default function Tools() {
         <ToolButton name="pencil" icon="edit" />
         <ToolButton name="eraser" icon="ink_eraser" />
         <ToolButton name="shape" icon="shapes" />
-        <ToolButton name="stickynote" icon="sticky_note" />
+        {/* <ToolButton name="stickynote" icon="sticky_note" /> */}
         <ToolButton name="text" icon="T" />
         <ToolButton name="image" icon="image" />
       </div>

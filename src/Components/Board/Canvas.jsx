@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveState, undo, redo, setOperation } from "../../stores/CanvasStore";
 import { changeTool } from "../../stores/ToolStore.js";
 import { fabric } from "fabric";
+import { socket } from "../../socket.js";
 
 const Canvas = forwardRef((props, ref) => {
   const canvas = useRef(null);
@@ -10,9 +11,14 @@ const Canvas = forwardRef((props, ref) => {
   const dispatch = useDispatch();
   const ToolStore = useSelector((state) => state.ToolStore);
   const CanvasStore = useSelector((state) => state.CanvasStore);
+  const room = useSelector((state) => state.CanvasStore.room);
   const change = (options) => {
     if (CanvasStore.operation === 0) {
       dispatch(saveState(board.current.toObject()));
+      socket.emit("Board", {
+        room: room,
+        board: board.current.toDataURL("png"),
+      });
     }
   };
   const Undo = () => {
@@ -37,6 +43,22 @@ const Canvas = forwardRef((props, ref) => {
   };
   useEffect(() => {
     if (board.current !== null) {
+      socket.on("joined", () => {
+        console.log("joined");
+        socket.emit("Board", {
+          room: room,
+          board: board.current.toDataURL("png"),
+        });
+      });
+    }
+
+    return () => {
+      socket.off("joined");
+    };
+  }, ["joined"]);
+
+  useEffect(() => {
+    if (board.current !== null) {
       if (CanvasStore.operation === 0) {
         board.current.on("object:added", change);
         board.current.on("object:modified", change);
@@ -57,6 +79,10 @@ const Canvas = forwardRef((props, ref) => {
       if (board.current === null) {
         board.current = new fabric.Canvas(canvas.current.id);
         dispatch(saveState(board.current.toObject()));
+      } else {
+        board.current.loadFromJSON(
+          JSON.stringify(CanvasStore.states[CanvasStore.currentState])
+        );
       }
     };
 
@@ -93,6 +119,11 @@ const Canvas = forwardRef((props, ref) => {
     };
   }, [dispatch, ToolStore, Canvas.currentState]);
 
+  useEffect(() => {
+    if (board.current !== null) {
+    }
+  }, [board.current]);
+
   const addShape = (options) => {
     if (!"shape" in ToolStore.properties) board.current.selection = true;
     else board.current.selection = false;
@@ -102,7 +133,7 @@ const Canvas = forwardRef((props, ref) => {
       e.set("selectable", false);
     });
     // board.current.renderAll();
-    console.log(board.current.getActiveObjects());
+    // console.log(board.current.getActiveObjects());
     const pointer = board.current.getPointer(options.e);
     board.current.isDrawingMode = false;
     if (ToolStore.properties.shape === "rect") {
@@ -270,11 +301,14 @@ const Canvas = forwardRef((props, ref) => {
 
   const setSize = () => {
     if (board.current !== null) {
-      var heightInVH = 50;
-      var widthInVW = 80;
-      var windowHeight = window.innerHeight * (heightInVH / 100);
-      var windowWidth = window.innerWidth * (widthInVW / 100);
-      board.current.setDimensions({ width: windowWidth, height: windowHeight });
+      const { board_width, board_height } = CanvasStore.dimensions;
+      // var heightInVH = 50;
+      // var widthInVW = 80;
+      // var windowHeight = window.innerHeight * (board_height / 100);
+      // var windowWidth = window.innerWidth * (board_width / 100);
+      board.current.setDimensions({ width: board_width, height: board_height });
+      // board.current.setBackground(CanvasStore.background);
+      board.current.backgroundColor = CanvasStore.background;
     }
   };
 
@@ -453,11 +487,11 @@ const Canvas = forwardRef((props, ref) => {
   };
 
   return (
-    <div className="w-full h-[90vh] bg-gray-100 mr-2 flex items-center justify-center">
+    <div className="w-full h-[90vh] mr-2 flex items-center justify-center overflow-scroll flex-wrap">
       <canvas
         ref={canvas}
         id="board"
-        className="border-2 border-black"
+        className="border-2 border-black top-0 m-3"
       ></canvas>
     </div>
   );

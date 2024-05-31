@@ -121,9 +121,10 @@ export default function Options() {
   return (
     <>
       {/* Selection */}
+      <div></div>
       {tool === "selection" && option && (
-        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-12 md:flex md:static rounded-lg p-4">
-          <span className="material-symbols-outlined hidden md:block">
+        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-32 text-black md:flex md:static rounded-lg p-4">
+          <span className="material-symbols-outlined block">
             arrow_selector_tool
           </span>
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible md:visible"></div>
@@ -132,10 +133,8 @@ export default function Options() {
         </div>
       )}
       {tool === "pencil" && option && (
-        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-12 md:flex md:static rounded-lg p-4">
-          <span className="material-symbols-outlined hidden md:block">
-            edit
-          </span>
+        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-32 text-black md:flex md:static rounded-lg p-4">
+          <span className="material-symbols-outlined block">edit</span>
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible md:visible"></div>
           <ColourPalate />
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible md:visible"></div>
@@ -151,10 +150,8 @@ export default function Options() {
       {/* Selection */}
       {/* Eraser */}
       {tool === "eraser" && option && (
-        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-12 md:flex md:static rounded-lg p-4">
-          <span className="material-symbols-outlined hidden md:block">
-            ink_eraser
-          </span>
+        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-32 text-black md:flex md:static rounded-lg p-4">
+          <span className="material-symbols-outlined block">ink_eraser</span>
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible md:visible"></div>
           <div className="flex items-center md:justify-center">
             <span className="font-semibold">Size: </span>
@@ -194,8 +191,8 @@ export default function Options() {
       {/* Eraser */}
       {/* Text */}
       {tool === "text" && option && (
-        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-12 md:flex md:static rounded-lg p-4">
-          <span className="material-symbols-outlined hidden md:block">T</span>
+        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-32 text-black md:flex md:static rounded-lg p-4">
+          <span className="material-symbols-outlined block">T</span>
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible md:visible"></div>
           <ColourPalate />
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible md:visible"></div>
@@ -329,10 +326,8 @@ export default function Options() {
 
       {/* Image */}
       {tool === "image" && option && (
-        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-12 md:flex md:static rounded-lg p-4">
-          <span className="material-symbols-outlined hidden md:block">
-            image
-          </span>
+        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-32 text-black md:flex md:static rounded-lg p-4">
+          <span className="material-symbols-outlined block">image</span>
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible md:visible"></div>
           <ImageForm />
         </div>
@@ -341,10 +336,8 @@ export default function Options() {
 
       {/* shape */}
       {tool === "shape" && option && (
-        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-12 md:flex md:static rounded-lg p-4">
-          <span className="material-symbols-outlined hidden md:block">
-            shapes
-          </span>
+        <div className="items-center md:p-0 md:px-3 block absolute bg-white right-12 top-32 text-black md:flex md:static rounded-lg p-4">
+          <span className="material-symbols-outlined block">shapes</span>
           <div className="border-black border-solid border-l-2 mx-2 w-1 h-6 invisible md:visible"></div>
           <button
             className={`mx-1 text-lg font-bold border-black px-2 text-center  ${
