@@ -3,6 +3,11 @@ This app is created using React-Redux & Fabric in Frontend and Node & socket.io 
 ## Features
 1) A complete board including tools to draw shapes and add images, with advance options to add text.
 2) You can share and show same board on different screens. For this purpose socket.io is used.
+
+## Demo
+Board Demo Here:-
+http://mabdullahali.free.nf/React-Fabric-Canvas
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
