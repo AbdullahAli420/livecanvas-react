@@ -6,7 +6,7 @@ This app is created using React-Redux & Fabric in Frontend and Node & socket.io 
 
 ## Demo
 Board Demo Here:-
-http://mabdullahali.free.nf/React-Fabric-Canvas
+http://mabdullahali.free.nf/react-fabric-canvas
 
 # Getting Started with Create React App
 
